@@ -4,25 +4,16 @@ import json
 import os
 import threading
 import time
+
 import cv2
-from openai import OpenAI
-import concurrent.futures
+
+from llm_client import LLMClient
 
 # Constants
 CAMERA_WINDOW_NAME = 'Camera Feed'
 SEND_INTERVAL = 2.5  # Interval in seconds
 frame_result = None
 frame_result_lock = threading.Lock()
-
-
-# Initialize OpenAI client once
-client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY", "temp"),
-    base_url=os.getenv("OPENAI_BASE_URL","http://localhost:1234/v1")
-)
-
-# Initialize ThreadPoolExecutor
-executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
 
 
 def send_frame_to_llm(frame):
@@ -43,6 +34,7 @@ def send_frame_to_llm(frame):
 
     # Send frame to LLM
     print("Sending frame to LLM", str(time.time()))
+    client = LLMClient().get_client()
     response = client.chat.completions.create(
         model="Qwen2-VL-7B-Instruct-GGUF",
         messages=[{
@@ -61,6 +53,7 @@ def send_frame_to_llm(frame):
     )
 
     return response.choices[0].message.content, analyze_time
+
 
 def process_frame(frame):
     """
@@ -85,13 +78,14 @@ def process_frame(frame):
         frame_result = json.dumps(json_result, indent=2).replace('.', '.\n')
     print("LLM Response:", frame_result)
 
+
 def display_camera_feed():
     """
     Captures frames from the camera and displays them in a window.
     Sends frames to the LLM at regular intervals.
     """
     # Open the camera
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(os.getenv("VIDEO_SOURCE", 1))
     if not cap.isOpened():
         print("Error: Could not open camera.")
         return
@@ -138,6 +132,7 @@ def display_camera_feed():
     # Release the camera and close all OpenCV windows
     cap.release()
     cv2.destroyAllWindows()
+
 
 if __name__ == "__main__":
     display_camera_feed()
