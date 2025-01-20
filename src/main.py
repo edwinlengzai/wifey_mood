@@ -4,10 +4,14 @@ import json
 import os
 import threading
 import time
+import logging
 
 import cv2
 
 from src.utils.llm_client import LLMClient
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Constants
 CAMERA_WINDOW_NAME = 'Camera Feed'
@@ -33,7 +37,7 @@ def send_frame_to_llm(frame):
     jpg_as_text = base64.b64encode(buffer).decode('utf-8')
 
     # Send frame to LLM
-    print("Sending frame to LLM", str(time.time()))
+    logging.info("Sending frame to LLM %s", str(time.time()))
     client = LLMClient().get_client()
     response = client.chat.completions.create(
         model=os.getenv("OPENAI_MODEL", "Qwen2-VL-7B-Instruct-GGUF"),
@@ -75,7 +79,7 @@ def process_frame(frame):
     # Format the result for display
     with frame_result_lock:
         frame_result = json.dumps(json_result, indent=2).replace('.', '.\n')
-    print("LLM Response:", frame_result)
+    logging.info("LLM Response: %s", frame_result)
 
 
 def display_camera_feed():
@@ -86,7 +90,7 @@ def display_camera_feed():
     # Open the camera
     cap = cv2.VideoCapture(os.getenv("VIDEO_SOURCE", 1))
     if not cap.isOpened():
-        print("Error: Could not open camera.")
+        logging.error("Error: Could not open camera.")
         return
 
     # Create a window to display the camera feed
@@ -98,7 +102,7 @@ def display_camera_feed():
         # Capture frame-by-frame
         ret, frame = cap.read()
         if not ret:
-            print("Error: Could not read frame.")
+            logging.error("Error: Could not read frame.")
             break
 
         # Display the result on the frame
