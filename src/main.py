@@ -41,12 +41,11 @@ def send_frame_to_llm(frame):
             "role": "user",
             "content": [
                 {"type": "text", "text": '''
-        Detect the person mood, reply in the following response:
+        Detect the person mood, reply in the following response in json format:
         {
           "angry_detected": true|false,
-          "mood":  describe the mood in 1 or 2 word
         }
-
+s
         '''},
                 {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{jpg_as_text}"}}]
         }],
