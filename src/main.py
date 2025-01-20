@@ -36,7 +36,7 @@ def send_frame_to_llm(frame):
     print("Sending frame to LLM", str(time.time()))
     client = LLMClient().get_client()
     response = client.chat.completions.create(
-        model="Qwen2-VL-7B-Instruct-GGUF",
+        model=os.getenv("OPENAI_MODEL", "Qwen2-VL-7B-Instruct-GGUF"),
         messages=[{
             "role": "user",
             "content": [
