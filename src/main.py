@@ -7,7 +7,7 @@ import time
 
 import cv2
 
-from llm_client import LLMClient
+from src.utils.llm_client import LLMClient
 
 # Constants
 CAMERA_WINDOW_NAME = 'Camera Feed'
