@@ -9,6 +9,7 @@ import logging
 import cv2
 
 from src.utils.llm_client import LLMClient
+from src.utils.object_detection_client import ObjectDetectionClient
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -98,12 +99,20 @@ def display_camera_feed():
     cv2.resizeWindow(CAMERA_WINDOW_NAME, 800, 600)
 
     last_send_time = time.time()
+
+    # Detect objects in the frame
+    detection_client = ObjectDetectionClient()
     while True:
         # Capture frame-by-frame
         ret, frame = cap.read()
         if not ret:
             logging.error("Error: Could not read frame.")
             break
+
+        detections = detection_client.detect_and_track(frame)
+
+        # Draw bounding boxes on the frame
+        frame_with_detections = detection_client.draw_tracks(frame, detections)
 
         # Display the result on the frame
         with frame_result_lock:
@@ -117,15 +126,15 @@ def display_camera_feed():
         # Split text into lines and display each line separately
         for i, line in enumerate(text.split('\n')):
             y = org[1] + i * 30  # Adjust the vertical position for each line
-            frame = cv2.putText(frame, line, (org[0], y), font, font_scale, color, thickness, cv2.LINE_AA)
+            frame_with_detections = cv2.putText(frame_with_detections, line, (org[0], y), font, font_scale, color, thickness, cv2.LINE_AA)
 
         # Show the frame
-        cv2.imshow(CAMERA_WINDOW_NAME, frame)
+        cv2.imshow(CAMERA_WINDOW_NAME, frame_with_detections)
 
         # Send frame to LLM at regular intervals
         current_time = time.time()
         if current_time - last_send_time >= SEND_INTERVAL:
-            threading.Thread(target=process_frame, args=(frame,)).start()
+            threading.Thread(target=process_frame, args=(frame_with_detections,)).start()
             last_send_time = current_time
 
         # Break the loop on 'q' key press
