@@ -1,15 +1,14 @@
-# test_main.py
+# test_engine.py
 import os
 
 import pytest
 import cv2
-from src.main import send_frame_to_llm
+from src.engine import send_frame_to_llm
 
 
 @pytest.fixture
 def sample_frame():
     # Create a sample frame for testing
-    print(os.getcwd())
     return cv2.imread('../sample/sample_image.jpg')
 
 def test_send_frame_to_llm(sample_frame):

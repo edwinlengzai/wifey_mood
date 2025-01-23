@@ -14,7 +14,7 @@ This project captures frames from a camera feed, sends them to a Language Learni
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/edwin100394/mood-detection.git
+    git clone https://github.com/edwinlengzai/mood-detection.git
     cd mood-detection
     ```
 
@@ -40,7 +40,7 @@ This project captures frames from a camera feed, sends them to a Language Learni
 
 2. Run the main script to start the camera feed and mood detection:
     ```sh
-    python src/main.py
+    python src/engine.py
     ```
 
 3. Press `q` to quit the camera feed.

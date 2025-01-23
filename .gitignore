@@ -129,3 +129,6 @@ cython_debug/
 .idea/
 
 .env
+
+# Pretrained models
+*.pt
