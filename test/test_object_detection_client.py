@@ -4,12 +4,15 @@ import numpy as np
 import pytest
 from src.utils.object_detection_client import ObjectDetectionClient
 
-
 @pytest.fixture
 def sample_image():
     # Create a sample image for testing
     return np.zeros((480, 640, 3), dtype=np.uint8)
 
+@pytest.fixture(autouse=True)
+def reset_singleton():
+    # Reset the singleton instance before each test
+    ObjectDetectionClient._instance = None
 
 def test_detect_and_track(sample_image):
     detection_client = ObjectDetectionClient()
@@ -40,7 +43,6 @@ def test_detect_and_track(sample_image):
 
         # Check that class_id is a string
         assert isinstance(track['class_id'], str)
-
 
 def test_draw_tracks(sample_image):
     detection_client = ObjectDetectionClient()

@@ -1,12 +1,22 @@
+# src/utils/object_detection_client.py
 import cv2
 from ultralytics import YOLO
 from deep_sort_realtime.deepsort_tracker import DeepSort
 
 class ObjectDetectionClient:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(ObjectDetectionClient, cls).__new__(cls, *args, **kwargs)
+        return cls._instance
+
     def __init__(self):
-        self.model = YOLO("yolo11n.pt")
-        self.tracker = DeepSort(max_age=30, n_init=3, nms_max_overlap=1.0, max_cosine_distance=0.2)
-        self.class_names = ["person"]  # Add other class names if needed
+        if not hasattr(self, 'initialized'):
+            self.model = YOLO("yolo11n.pt")
+            self.tracker = DeepSort(max_age=30, n_init=3, nms_max_overlap=1.0, max_cosine_distance=0.2)
+            self.class_names = ["person"]  # Add other class names if needed
+            self.initialized = True
 
     def detect_and_track(self, image_data):
         """
